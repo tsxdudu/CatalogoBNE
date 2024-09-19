@@ -40,7 +40,7 @@ function renderItems() {
 
 function openAddPostModal() {
     document.getElementById('addPostModal').style.display = 'flex';
-  }
+}
 
 
 // Função para adicionar um novo item ao catálogo
@@ -118,10 +118,10 @@ function deleteItem() {
 function atualizarCard(cardID, item) {
     const card = document.getElementById(cardID);
     const content = card.querySelector('.card-content');
-    
+
     content.querySelector('h3').textContent = item.nome;
     content.querySelector('p').textContent = item.descricao;
-    
+
     const mainImage = card.querySelector('img:not(.editor img)');
     mainImage.src = item.imagem;
     mainImage.alt = item.nome;
@@ -169,28 +169,209 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.querySelector('.search-input');
     const searchButton = document.querySelector('.search-button');
     const cardItems = document.querySelectorAll('.card-item');
-  
+
     searchButton.addEventListener('click', function () {
-      const searchTerm = searchInput.value.toLowerCase();
-      cardItems.forEach((item) => {
-        const itemName = item.querySelector('h3').textContent.toLowerCase();
-        if (itemName.includes(searchTerm)) {
-          item.style.display = 'flex';
-        } else {
-          item.style.display = 'none';
-        }
-      });
+        const searchTerm = searchInput.value.toLowerCase();
+        cardItems.forEach((item) => {
+            const itemName = item.querySelector('h3').textContent.toLowerCase();
+            if (itemName.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     });
-  
+
     // Função ao clicar no botão "Eu quero isso!"
     const wantButtons = document.querySelectorAll('.card-item button');
     wantButtons.forEach((button) => {
-      button.addEventListener('click', function () {
-        alert('Você escolheu: ' + this.parentElement.querySelector('h3').textContent);
-      });
+        button.addEventListener('click', function () {
+            alert('Você escolheu: ' + this.parentElement.querySelector('h3').textContent);
+        });
     });
-  });
-  
+});
+
+//dudu69
+
+let currentEditType = '';
+let isEditing = false;
+let users = [];
+let clients = [];
+function loadUsers() {
+
+    currentEditType = 'user';
+    document.getElementById('content').innerHTML = `
+        <h2>Usuários</h2>
+        <div class="mb-3">
+            <button class="btn btn-primary" onclick="addUser()">Adicionar Usuário</button>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    `;
+    loadUserData();
+}
+
+function loadClients() {
+    currentEditType = 'client';
+    document.getElementById('content').innerHTML = `
+        <h2>Clientes</h2>
+        <div class="mb-3">
+            <button class="btn btn-primary" onclick="addClient()">Adicionar Cliente</button>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Empresa</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="clientTable"></tbody>
+        </table>
+    `;
+    loadClientData();
+}
+
+function loadUserData() {
+    let userTable = document.getElementById('userTable');
+    userTable.innerHTML = '';
+    users.forEach(user => {
+        userTable.innerHTML += `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.nome}</td>
+                <td>${user.email}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editItem(${user.id})">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Deletar</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function loadClientData() {
+    let clientTable = document.getElementById('clientTable');
+    clientTable.innerHTML = '';
+    clients.forEach(client => {
+        clientTable.innerHTML += `
+            <tr>
+                <td>${client.id}</td>
+                <td>${client.nome}</td>
+                <td>${client.empresa}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editItem(${client.id})">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteClient(${client.id})">Deletar</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+
+function addUser() {
+    isEditing = false;
+    document.getElementById('editId').value = '';
+    document.getElementById('editName').value = '';
+    document.getElementById('editEmail').value = '';
+    document.getElementById('emailField').style.display = 'block';
+    document.getElementById('companyField').style.display = 'none';
+    let modal = new bootstrap.Modal(document.getElementById('editModal'));
+    modal.show();
+}
+
+
+function addClient() {
+    isEditing = false;
+    document.getElementById('editId').value = '';
+    document.getElementById('editName').value = '';
+    document.getElementById('editCompany').value = '';
+    document.getElementById('emailField').style.display = 'none';
+    document.getElementById('companyField').style.display = 'block';
+    let modal = new bootstrap.Modal(document.getElementById('editModal'));
+    modal.show();
+}
+
+function editItem(id) {
+    isEditing = true;
+    let item;
+    if (currentEditType === 'user') {
+        item = users.find(u => u.id === id);
+        document.getElementById('emailField').style.display = 'block';
+        document.getElementById('companyField').style.display = 'none';
+        document.getElementById('editName').value = item.nome;
+        document.getElementById('editEmail').value = item.email;
+    } else {
+        item = clients.find(c => c.id === id);
+        document.getElementById('emailField').style.display = 'none';
+        document.getElementById('companyField').style.display = 'block';
+        document.getElementById('editName').value = item.nome;
+        document.getElementById('editCompany').value = item.empresa;
+    }
+    document.getElementById('editId').value = id;
+    let modal = new bootstrap.Modal(document.getElementById('editModal'));
+    modal.show();
+}
+
+document.getElementById('editForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('editId').value;
+    const nome = document.getElementById('editName').value;
+
+    if (currentEditType === 'user') {
+        if (isEditing) {
+            const email = document.getElementById('editEmail').value;
+            const user = users.find(u => u.id == id);
+            user.nome = nome;
+            user.email = email;
+        } else {
+            const email = document.getElementById('editEmail').value;
+            users.push({ id: users.length + 1, nome: nome, email: email });
+        }
+        loadUserData();
+    } else {
+        if (isEditing) {
+            const empresa = document.getElementById('editCompany').value;
+            const client = clients.find(c => c.id == id);
+            client.nome = nome;
+            client.empresa = empresa;
+        } else {
+            const empresa = document.getElementById('editCompany').value;
+            clients.push({ id: clients.length + 1, nome: nome, empresa: empresa });
+        }
+        loadClientData();
+    }
+
+    let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+    modal.hide();
+});
+
+function deleteUser(id) {
+    const index = users.findIndex(u => u.id === id);
+    if (index !== -1) {
+        users.splice(index, 1);
+        loadUserData();
+    }
+}
+
+function deleteClient(id) {
+    const index = clients.findIndex(c => c.id === id);
+    if (index !== -1) {
+        clients.splice(index, 1);
+        loadClientData();
+    }
+}
+
 
 // Inicializa o catálogo renderizando os itens
 renderItems();

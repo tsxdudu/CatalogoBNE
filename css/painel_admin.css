@@ -1,0 +1,10 @@
+/* Ajusta a largura da barra lateral */
+#sidebar-wrapper {
+    width: 300px; /* Ajuste o valor conforme necessário */
+}
+
+/* Para garantir que a barra lateral se expanda ao longo de toda a altura da tela */
+#wrapper {
+    min-height: 100vh;
+    display: flex;
+}

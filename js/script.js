@@ -1,250 +1,214 @@
+let produtos = [];
+let vendedores = [];
+let usuarios = [];
+let enderecos = [];
+let avaliacoesProdutos = [];
+let avaliacoesVendedores = [];
+let statusVendedores = [];
 
-//dudu69
-// Dados em JSON para armazenar usuários, clientes e produtos
-let users = [];
-let clients = [];
-let products = [];
-let currentProductIndex = null;
-let currentUserIndex = null;
-let currentClientIndex = null;
-
-// Função para renderizar as tabelas
-function renderTables() {
-    // Renderiza a tabela de usuários
-    const userTableBody = document.getElementById('userTableBody');
-    userTableBody.innerHTML = '';
-    users.forEach((user, index) => {
-        userTableBody.innerHTML += `
-            <tr>
-                <td>${user.id}</td> <!-- Exibe o ID do usuário -->
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.phone}</td>
-                <td>${user.registration_date}</td>
-                <td>${user.address}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editUser(${index})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteUser(${index})">Deletar</button>
-                </td>
-            </tr>
-        `;
-    });
-
-    // Renderiza a tabela de clientes
-    const clientTableBody = document.getElementById('clientTableBody');
-    clientTableBody.innerHTML = '';
-    clients.forEach((client, index) => {
-        clientTableBody.innerHTML += `
-            <tr>
-                <td>${client.id}</td>
-                <td>${client.name}</td>
-                <td>${client.email}</td>
-                <td>${client.phone}</td>
-                <td>${client.cpf_cnpj}</td>
-                <td>${client.registration}</td>
-                <td>${client.avaliation_id}</td>
-                <td>${client.address}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editClient(${index})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteClient(${index})">Deletar</button>
-                </td>
-            </tr>
-        `;
-    });
-
-    // Renderiza a tabela de produtos
-    const productTableBody = document.getElementById('productTableBody');
-    productTableBody.innerHTML = '';
-    products.forEach((product, index) => {
-        productTableBody.innerHTML += `
-            <tr>
-                <td>${product.id}</td>
-                <td>${product.title}</td>
-                <td>${product.description}</td>
-                <td><img src="${product.url_image}" alt="${product.title}" style="width: 50px; height: 50px;"></td>
-                <td>${product.price}</td>
-                <td>${product.discount}%</td>
-                <td>${product.sales_count}</td>
-                <td>${product.registration_date}</td>
-                <td>${product.stock}</td>
-                <td>${product.avaliation}</td>
-                <td>${product.saller_id}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editProduct(${index})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${index})">Deletar</button>
-                </td>
-            </tr>
-        `;
-    });
+function openForm(formId) {
+    document.getElementById(formId).style.display = 'block';
 }
 
-// Funções CRUD para Usuários
-document.getElementById('userForm').addEventListener('submit', function (event) {
+function cancelAdd(formId) {
+    document.getElementById(formId).style.display = 'none';
+    document.getElementById(formId).reset();
+}
+
+function addProduct(event) {
     event.preventDefault();
-    const name = document.getElementById('userName').value;
-    const email = document.getElementById('userEmail').value;
-    const phone = document.getElementById('userPhone').value;
-    const registration_date = document.getElementById('userRegistrationDate').value;
-    const address = document.getElementById('userAddress').value;
-
-    const userData = {
-        id: users.length > 0 ? users[users.length - 1].id + 1 : 1,
-        name,
-        email,
-        phone,
-        registration_date,
-        address,
+    const product = {
+        id: produtos.length + 1,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        price: parseFloat(document.getElementById('price').value),
+        discount: parseFloat(document.getElementById('discount').value),
+        url_image: document.getElementById('url_image').value,
+        sales_count: parseInt(document.getElementById('sales_count').value),
+        avaliation: parseFloat(document.getElementById('avaliation').value),
+        saller_id: parseInt(document.getElementById('saller_id').value)
     };
-
-    if (currentUserIndex === null) {
-        users.push(userData);
-    } else {
-        userData.id = users[currentUserIndex].id; 
-        users[currentUserIndex] = userData;
-        currentUserIndex = null;
-        document.querySelector('#userForm button').innerText = 'Adicionar Usuário';
-    }
-
-    renderTables();
-    this.reset();
-});
-
-function editUser(index) {
-    const user = users[index];
-    document.getElementById('userName').value = user.name;
-    document.getElementById('userEmail').value = user.email;
-    document.getElementById('userPhone').value = user.phone;
-    document.getElementById('userRegistrationDate').value = user.registration_date;
-    document.getElementById('userAddress').value = user.address;
-    currentUserIndex = index;
-    document.querySelector('#userForm button').innerText = 'Atualizar Usuário';
+    produtos.push(product);
+    displayProducts();
+    cancelAdd('productForm');
 }
 
-function deleteUser(index) {
-    users.splice(index, 1);
-    renderTables();
+function displayProducts() {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = '<h3>Lista de Produtos</h3>' + produtos.map(p => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">${p.title}</h5>
+                <p class="card-text">${p.description}</p>
+                <p>Preço: R$ ${p.price.toFixed(2)}</p>
+                <p>Desconto: ${p.discount}%</p>
+                <p>Quantidade Vendida: ${p.sales_count}</p>
+                <p>Avaliação: ${p.avaliation}</p>
+                <p>ID do Vendedor: ${p.saller_id}</p>
+            </div>
+        </div>
+    `).join('');
 }
 
-// Funções CRUD para Clientes
-document.getElementById('clientForm').addEventListener('submit', function (event) {
+function addVendedor(event) {
     event.preventDefault();
-    const name = document.getElementById('clientName').value;
-    const email = document.getElementById('clientEmail').value;
-    const phone = document.getElementById('clientPhone').value;
-    const cpf_cnpj = document.getElementById('clientCpfCnpj').value;
-    const registration = document.getElementById('clientRegistration').value;
-    const avaliation_id = document.getElementById('clientAvaliationId').value;
-    const address = document.getElementById('clientAddress').value;
-
-    const clientData = {
-        id: clients.length > 0 ? clients[clients.length - 1].id + 1 : 1,
-        name,
-        email,
-        phone,
-        cpf_cnpj,
-        registration,
-        avaliation_id,
-        address,
+    const vendedor = {
+        id: vendedores.length + 1,
+        name: document.getElementById('vendedor_name').value,
+        phone_number: document.getElementById('phone_number').value,
+        cpf_cnpj: document.getElementById('cpf_cnpj').value,
+        avaliation_id: parseInt(document.getElementById('avaliation_id').value),
+        address: document.getElementById('vendedor_address').value
     };
-
-    if (currentClientIndex === null) {
-        clients.push(clientData);
-    } else {
-        clientData.id = clients[currentClientIndex].id;
-        clients[currentClientIndex] = clientData;
-        currentClientIndex = null;
-        document.querySelector('#clientForm button').innerText = 'Adicionar Cliente';
-    }
-
-    renderTables();
-    this.reset();
-});
-
-function editClient(index) {
-    const client = clients[index];
-    document.getElementById('clientName').value = client.name;
-    document.getElementById('clientEmail').value = client.email;
-    document.getElementById('clientPhone').value = client.phone;
-    document.getElementById('clientCpfCnpj').value = client.cpf_cnpj;
-    document.getElementById('clientRegistration').value = client.registration;
-    document.getElementById('clientAvaliationId').value = client.avaliation_id;
-    document.getElementById('clientAddress').value = client.address;
-    currentClientIndex = index;
-    document.querySelector('#clientForm button').innerText = 'Atualizar Cliente';
+    vendedores.push(vendedor);
+    displayVendedores();
+    cancelAdd('vendedorForm');
 }
 
-function deleteClient(index) {
-    clients.splice(index, 1);
-    renderTables();
+function displayVendedores() {
+    const vendedorList = document.getElementById('vendedor-list');
+    vendedorList.innerHTML = '<h3>Lista de Vendedores</h3>' + vendedores.map(v => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">${v.name}</h5>
+                <p class="card-text">Telefone: ${v.phone_number}</p>
+                <p>CPF/CNPJ: ${v.cpf_cnpj}</p>
+                <p>ID da Avaliação: ${v.avaliation_id}</p>
+                <p>Endereço: ${v.address}</p>
+            </div>
+        </div>
+    `).join('');
 }
 
-// Funções CRUD para Produtos
-document.getElementById('productForm').addEventListener('submit', function (event) {
+function addUser(event) {
     event.preventDefault();
-    const title = document.getElementById('productTitle').value;
-    const description = document.getElementById('productDescription').value;
-    const url_image = document.getElementById('productImage').value;
-    const price = document.getElementById('productPrice').value;
-    const discount = document.getElementById('productDiscount').value;
-    const sales_count = document.getElementById('productSalesCount').value;
-    const registration_date = document.getElementById('productRegistrationDate').value;
-    const stock = document.getElementById('productStock').value;
-    const avaliation = document.getElementById('productAvaliation').value;
-    const saller_id = document.getElementById('productSallerId').value;
-
-    const productData = {
-        id: products.length > 0 ? products[products.length - 1].id + 1 : 1, // Gera o ID automaticamente
-        title,
-        description,
-        url_image,
-        price,
-        discount,
-        sales_count,
-        registration_date,
-        stock,
-        avaliation,
-        saller_id,
+    const user = {
+        id: usuarios.length + 1,
+        name: document.getElementById('user_name').value,
+        email: document.getElementById('user_email').value,
+        phone_number: document.getElementById('user_phone').value,
+        address: document.getElementById('user_address').value
     };
-
-    if (currentProductIndex === null) {
-        products.push(productData);
-    } else {
-        productData.id = products[currentProductIndex].id;
-        products[currentProductIndex] = productData;
-        currentProductIndex = null;
-        document.querySelector('#productForm button').innerText = 'Adicionar Produto';
-    }
-
-    renderTables();
-    this.reset();
-});
-
-function editProduct(index) {
-    const product = products[index];
-    document.getElementById('productTitle').value = product.title;
-    document.getElementById('productDescription').value = product.description;
-    document.getElementById('productImage').value = product.url_image;
-    document.getElementById('productPrice').value = product.price;
-    document.getElementById('productDiscount').value = product.discount;
-    document.getElementById('productSalesCount').value = product.sales_count;
-    document.getElementById('productRegistrationDate').value = product.registration_date;
-    document.getElementById('productStock').value = product.stock;
-    document.getElementById('productAvaliation').value = product.avaliation;
-    document.getElementById('productSallerId').value = product.saller_id;
-    currentProductIndex = index;
-    document.querySelector('#productForm button').innerText = 'Atualizar Produto';
+    usuarios.push(user);
+    displayUsers();
+    cancelAdd('userForm');
 }
 
-function deleteProduct(index) {
-    products.splice(index, 1);
-    renderTables();
+function displayUsers() {
+    const userList = document.getElementById('user-list');
+    userList.innerHTML = '<h3>Lista de Usuários</h3>' + usuarios.map(u => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">${u.name}</h5>
+                <p class="card-text">Email: ${u.email}</p>
+                <p>Telefone: ${u.phone_number}</p>
+                <p>Endereço: ${u.address}</p>
+            </div>
+        </div>
+    `).join('');
 }
 
-// Inicializa a tabela ao carregar a página
-renderTables();
+function addEndereco(event) {
+    event.preventDefault();
+    const endereco = {
+        id: enderecos.length + 1,
+        street: document.getElementById('street').value,
+        number: parseInt(document.getElementById('number').value),
+        complement: document.getElementById('complement').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        country: document.getElementById('country').value,
+        postal_code: document.getElementById('postal_code').value
+    };
+    enderecos.push(endereco);
+    displayEnderecos();
+    cancelAdd('enderecoForm');
+}
 
+function displayEnderecos() {
+    const enderecoList = document.getElementById('endereco-list');
+    enderecoList.innerHTML = '<h3>Lista de Endereços</h3>' + enderecos.map(e => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <p><strong>Rua:</strong> ${e.street}, ${e.number}</p>
+                <p><strong>Complemento:</strong> ${e.complement}</p>
+                <p><strong>Cidade:</strong> ${e.city}</p>
+                <p><strong>Estado:</strong> ${e.state}</p>
+                <p><strong>País:</strong> ${e.country}</p>
+                <p><strong>Código Postal:</strong> ${e.postal_code}</p>
+            </div>
+        </div>
+    `).join('');
+}
 
+function addAvaliacaoProduto(event) {
+    event.preventDefault();
+    const avaliacaoProduto = {
+        id: avaliacoesProdutos.length + 1,
+        rating: parseInt(document.getElementById('rating_produto').value),
+        comment: document.getElementById('comment_produto').value
+    };
+    avaliacoesProdutos.push(avaliacaoProduto);
+    displayAvaliacoesProdutos();
+    cancelAdd('avaliacaoProdutoForm');
+}
 
-// Inicializa o catálogo renderizando os itens
-renderItems();
+function displayAvaliacoesProdutos() {
+    const avaliacaoProdutoList = document.getElementById('avaliacaoProduto-list');
+    avaliacaoProdutoList.innerHTML = '<h3>Lista de Avaliações de Produtos</h3>' + avaliacoesProdutos.map(a => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <p>Avaliação: ${a.rating}</p>
+                <p>Comentário: ${a.comment}</p>
+            </div>
+        </div>
+    `).join('');
+}
 
+function addAvaliacaoVendedor(event) {
+    event.preventDefault();
+    const avaliacaoVendedor = {
+        id: avaliacoesVendedores.length + 1,
+        rating: parseInt(document.getElementById('rating_vendedor').value),
+        reviews_count: parseInt(document.getElementById('reviews_count').value),
+        sales_count: parseInt(document.getElementById('sales_count_vendedor').value)
+    };
+    avaliacoesVendedores.push(avaliacaoVendedor);
+    displayAvaliacoesVendedores();
+    cancelAdd('avaliacaoVendedorForm');
+}
+
+function displayAvaliacoesVendedores() {
+    const avaliacaoVendedorList = document.getElementById('avaliacaoVendedor-list');
+    avaliacaoVendedorList.innerHTML = '<h3>Lista de Avaliações de Vendedores</h3>' + avaliacoesVendedores.map(a => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <p>Avaliação: ${a.rating}</p>
+                <p>Contagem de Comentários: ${a.reviews_count}</p>
+                <p>Contagem de Vendas: ${a.sales_count}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+function addStatus(event) {
+    event.preventDefault();
+    const status = {
+        id: statusVendedores.length + 1,
+        status: document.getElementById('status').value
+    };
+    statusVendedores.push(status);
+    displayStatus();
+    cancelAdd('statusForm');
+}
+
+function displayStatus() {
+    const statusList = document.getElementById('status-list');
+    statusList.innerHTML = '<h3>Lista de Status de Vendedores</h3>' + statusVendedores.map(s => `
+        <div class="card mb-2">
+            <div class="card-body">
+                <p>Status: ${s.status}</p>
+            </div>
+        </div>
+    `).join('');
+}

@@ -411,3 +411,21 @@ a:hover {
     font-size: 14px; 
     color: #ffffff; 
 }
+
+.login-button {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0); 
+    border: none; 
+    padding: 10px 20px; 
+    text-align: center; 
+    text-decoration: none; 
+    display: inline-block; 
+    margin-left: 10px; 
+    border-radius: 9999px; 
+    cursor: pointer; 
+  }
+  
+  .login-button:hover {
+    background-color: #fbfffb;
+  }
+  
